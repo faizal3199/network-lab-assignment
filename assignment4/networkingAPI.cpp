@@ -258,6 +258,10 @@ public:
 		}
 	}
 
+	void closeSocket(){
+		close(this->socketFD);
+	}
+
 private:
 	void error(const char *msg)
 	{
