@@ -63,6 +63,18 @@ public:
 		}
 	}
 
+	string getIPAddress(){
+		return string(inet_ntoa(this->origin_connection.sin_addr));
+	}
+
+	int getPortNumber(){
+		return ntohs(this->origin_connection.sin_port);
+	}
+
+	int getSocketFD(){
+		return this->socket_fd;
+	}
+
 	void closeSocket(){
 		close(this->socket_fd);
 	}
@@ -133,17 +145,10 @@ public:
 
 			printf("[+] Recivied connection from %s : %d\n",inet_ntoa(client_connection.sin_addr), ntohs(client_connection.sin_port));
 
-			// pid = fork();
-
-			// if(pid < 0){
-			// 	error("[-] Error while forking process");
-			// }
-			// else if(pid == 0){//child call the callbak here
+			
 			printf("[+] New thread created. Callback handler called\n");
 			thread temp_thread(*callback_function,new TCPsocketHandler(client_connection,clientConnectionSockFD));
 			temp_thread.detach();
-				// exit(0);
-			// }
 		}
 
 	}
@@ -260,6 +265,18 @@ public:
 		}
 	}
 
+	string getIPAddress(){
+		return string(inet_ntoa(this->conn_address.sin_addr));
+	}
+
+	int getPortNumber(){
+		return ntohs(this->conn_address.sin_port);
+	}
+	
+	int getSocketFD(){
+		return this->socketFD;
+	}
+
 	void closeSocket(){
 		close(this->socketFD);
 	}
@@ -331,16 +348,10 @@ public:
 
 			printf("[+] Recivied connection from %s : %d\n",inet_ntoa(client_address.sin_addr), ntohs(client_address.sin_port));
 
-			pid = fork();
-
-			if(pid < 0 ){
-				error("[-] Error creating new thread");
-			}
-			else if(pid == 0){//Child process. Handle callback here
-				string temp(bufferRead);
-				(*callback_function)(new UDPsocketHandler(this->client_address,this->socketFD,temp));
-				exit(0);
-			}
+			string temp(bufferRead);
+			printf("[+] New thread created. Callback handler called\n");
+			thread temp_thread(*callback_function,new UDPsocketHandler(this->client_address,this->socketFD,temp));
+			temp_thread.detach();
 		}
 	}
 

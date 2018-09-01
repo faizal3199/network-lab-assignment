@@ -1,25 +1,47 @@
 #include "networkingAPI.cpp"
 
+void trim_crlf(string &data){
+	while(true)
+		if(data.back() == '\n' || data.back() == '\r' || data.back() == '\x00')
+			data.pop_back();
+		else
+			return;
+}
+
 void server_listener(TCPsocketHandler* socketObj){
 	string recved;
+
 	while(true){
 		recved = socketObj->recvData();
-		printf("\r[SERVER] %s",&recved[0]);
+		
+		if(recved.length() == 0){
+			delete socketObj;
+			return;
+		}
+
+		trim_crlf(recved);
+
+		printf("\r%s\n[YOU] ",&recved[0]);
+		fflush(stdout);
 	}
 }
 
 void socket_handler(TCPsocketHandler* socketObj){
-	pid_t pid = fork();
-	if(pid == 0){//Make child process listen to server
-		server_listener(socketObj);
-	}
+	thread	new_thread(server_listener,socketObj);
+	new_thread.detach();
 
 	string input;
+	char inputBuffer[200];
 	while(true){
-		printf("[YOU] ");
-		cin>>input;
+		printf("\r[YOU] ");
+		fflush(stdout);
+
+		cin.getline(&inputBuffer[0],200);
+		input = inputBuffer;
+		trim_crlf(input);
+
 		socketObj->sendData(input);
-		printf("\n");
+		// printf("\n");
 	}
 }
 
