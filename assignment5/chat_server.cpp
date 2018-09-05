@@ -1,8 +1,8 @@
-#include "networkingAPI.cpp"
+#include "../general/networkingAPI.cpp"
 
 void trim_crlf(string &data){
 	while(true)
-		if(data.back() == '\n' || data.back() == '\r' || data.back() == '\x00')
+		if(data.size() > 0 && (data.back() == '\n' || data.back() == '\r' || data.back() == '\x00'))
 			data.pop_back();
 		else
 			return;
@@ -34,9 +34,11 @@ struct chatRoomStruct{
 		TCPsocketHandler* newMember = members[username];
 		string tempRecv;
 		while(true){
-			tempRecv = newMember->recvData();
-			
-			if(tempRecv.size() == 0){
+
+			try{
+				tempRecv = newMember->recvData();
+			}
+			catch(zeroLengthException& e){
 				remove_member(username);
 				return;
 			}
@@ -64,8 +66,10 @@ struct chatRoomStruct{
 			temp = "[SERVER] Provide your username:";
 			newMember->sendData(temp);
 
-			username = newMember->recvData();
-			if(username.length() == 0){
+			try{
+				username = newMember->recvData();
+			}
+			catch(zeroLengthException& e){
 				delete newMember;
 				return;
 			}
@@ -99,16 +103,17 @@ struct chatRoomStruct{
 map<string,chatRoomStruct*> chatRoomMapping;
 
 void new_client_hanlder(TCPsocketHandler* socketObj){
-	printf("[*] NEW client connected\n");
 	socketObj->sendData("[SERVER] [J]oin or [C]reate new room ?[J/C]\n");
 
-	string response = socketObj->recvData();
-	if(response.length() == 0){
+	string response;
+
+	try{
+		response = socketObj->recvData();
+	}
+	catch(zeroLengthException& e){
 		delete socketObj;
 		return;
 	}
-
-	printf("[*] Client response: %s\n",&response[0]);
 
 	response = response.substr(0,1); //Strip CRLF
 
@@ -116,9 +121,12 @@ void new_client_hanlder(TCPsocketHandler* socketObj){
 
 	if(response == "C" || response == "c"){
 		socketObj->sendData("[SERVER] Enter chat room ID to create:\n");
-		string chat_room_id = socketObj->recvData();
+		string chat_room_id;
 
-		if(chat_room_id.length() == 0){
+		try{
+			chat_room_id = socketObj->recvData();
+		}
+		catch(zeroLengthException& e){
 			delete socketObj;
 			return;
 		}
@@ -137,16 +145,22 @@ void new_client_hanlder(TCPsocketHandler* socketObj){
 		socketObj->sendData(temp);
 
 		chatRoomMapping.insert({chat_room_id,new chatRoomStruct(max_size_chat_room,chat_room_id)});
+		printf("[*] Created new chat room with ID: %s\n",&chat_room_id[0]);
 		chatRoomMapping[chat_room_id]->add_new_member(socketObj);
 	}
 	else if(response == "J" || response == "j"){
 		socketObj->sendData("[SERVER] Enter chat room ID to join:\n");
-		string chat_room_id = socketObj->recvData();
+		
+		string chat_room_id;
 
-		if(chat_room_id.length() == 0){
+		try{
+			chat_room_id = socketObj->recvData();
+		}
+		catch(zeroLengthException& e){
 			delete socketObj;
 			return;
 		}
+
 
 		if(chatRoomMapping.count(chat_room_id) == 1){
 			chatRoomMapping[chat_room_id]->add_new_member(socketObj);

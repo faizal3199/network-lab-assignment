@@ -1,8 +1,8 @@
-#include "networkingAPI.cpp"
+#include "../general/networkingAPI.cpp"
 
 void trim_crlf(string &data){
 	while(true)
-		if(data.back() == '\n' || data.back() == '\r' || data.back() == '\x00')
+		if(data.size() > 0 && (data.back() == '\n' || data.back() == '\r' || data.back() == '\x00'))
 			data.pop_back();
 		else
 			return;
@@ -12,11 +12,13 @@ void server_listener(TCPsocketHandler* socketObj){
 	string recved;
 
 	while(true){
-		recved = socketObj->recvData();
-		
-		if(recved.length() == 0){
+
+		try{
+			recved = socketObj->recvData();
+		}
+		catch(zeroLengthException& e){
 			delete socketObj;
-			return;
+			exit(0);
 		}
 
 		trim_crlf(recved);
@@ -40,6 +42,8 @@ void socket_handler(TCPsocketHandler* socketObj){
 		input = inputBuffer;
 		trim_crlf(input);
 
+		if(socketObj == NULL)
+			return;
 		socketObj->sendData(input);
 		// printf("\n");
 	}
