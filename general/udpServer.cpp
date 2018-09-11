@@ -31,6 +31,10 @@ public:
 		closeSocket();
 	}
 
+	int getSocketFD(){
+		return this->socketFD;
+	}
+	
 	void closeSocket(){
 		close(this->socketFD);
 	}

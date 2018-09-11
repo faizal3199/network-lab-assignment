@@ -35,6 +35,10 @@ public:
 		closeConnection();
 	}
 
+	int getSocketFD(){
+		return this->serverSockFD;
+	}
+
 	void closeConnection(){
 		close(this->serverSockFD);
 	}
