@@ -246,8 +246,11 @@ int main(int argc,char* argv[]){
 	tcpClient client(domain,port);
 
 	payload = "GET "+URI +" HTTP/1.1\r\n";
-	payload += "Host: "+domain;
+	payload += "Host: "+domain+"\r\n";
+	payload += "Connection: close";
 	payload += "\r\n\r\n";
+
+	printf("\n*PAYLOAD*\n%s\n", &payload[0]);
 
 	client.startTalking((TCPsocketHandlerCallbackType)&handler_function);
 	

@@ -18,12 +18,12 @@ public:
 		int status_code;
 		string return_value;
 
-		char readBuffer[1024];
+		char readBuffer[1025];
 
 		while(true){
-			bzero(readBuffer,1024);
+			bzero(readBuffer,1025);
 
-			status_code = read(this->socket_fd,readBuffer,1023);
+			status_code = read(this->socket_fd,readBuffer,1024);
 
 			if(status_code < 0){
 				error("[-] {TCP} Error reading from socket connection");
@@ -33,7 +33,7 @@ public:
 
 			return_value += temp;
 
-			if(status_code < 1023){//Maybe data is pending
+			if(status_code == 0){//Nothing to read exit now
 				break;
 			}
 		}
