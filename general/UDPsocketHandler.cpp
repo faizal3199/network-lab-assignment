@@ -26,7 +26,7 @@ public:
 				error("[-] {UDP} Error reading from socket connection");
 			}
 
-			string temp(bufferRead);
+			string temp(begin(bufferRead),begin(bufferRead)+status_code);
 			this->data = temp;
 		}
 

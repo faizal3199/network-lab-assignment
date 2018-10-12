@@ -29,7 +29,7 @@ public:
 				error("[-] {TCP} Error reading from socket connection");
 			}
 
-			string temp(readBuffer);
+			string temp(begin(readBuffer),begin(readBuffer)+status_code);
 
 			return_value += temp;
 
