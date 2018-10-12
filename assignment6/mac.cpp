@@ -47,6 +47,7 @@ string getMacAddress(char* iface)
 
 	close(fd);
 	
+	// The family at the moment contains ARPHRD_*
 	mac = (char *)ifr.ifr_hwaddr.sa_data;
 	
 	string ret_value = "";
