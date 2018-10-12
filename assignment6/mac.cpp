@@ -11,6 +11,7 @@
 #include <sys/types.h>
 #include <ifaddrs.h>
 
+//netdevice provides low level access
 using namespace std;
 
 string intToStringHex(int x,int fill = 2){
@@ -29,8 +30,8 @@ string getMacAddress(char* iface)
 	// structure of ifreq
 	// http://man7.org/linux/man-pages/man7/netdevice.7.html
 	//*********
-
-	ifreq ifr;
+	ifreq ifr; // ifr has interface name,interface address,hardware address
+	
 	char *mac;
 	
 	fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -50,6 +51,7 @@ string getMacAddress(char* iface)
 	
 	string ret_value = "";
 
+	//Convert to readable address
 	for(int i=0;i<6;i++){
 		ret_value += intToStringHex((int)mac[i]) + ":";
 	}
@@ -60,6 +62,8 @@ string getMacAddress(char* iface)
 }
 
 int main(){
+	//http://man7.org/linux/man-pages/man3/getifaddrs.3.html
+	//ifaddrs contains name,address, netmask address,pointer to next interface
 	ifaddrs *addrs,*tmp;
 
 	getifaddrs(&addrs);
